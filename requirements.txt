@@ -1,0 +1,3 @@
+fastapi
+uvicorn
+stripe>=8.0.0
