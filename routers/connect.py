@@ -106,16 +106,18 @@ def connect_stripe_callback(request: Request, code: str | None = None, error: st
 
 @connect_router.get("/status")
 def connect_status(request: Request):
-    """Return { connected: bool, account_id?: str }."""
+    """Return { connected: bool, account_id?: str, stripe_configured: bool }."""
+    stripe_configured = bool(settings.STRIPE_CLIENT_ID and settings.STRIPE_CLIENT_SECRET)
     session_id = _get_session_id_from_cookie(request)
     if not session_id:
-        return {"connected": False}
+        return {"connected": False, "stripe_configured": stripe_configured}
     data = get_session(session_id)
     if not data:
-        return {"connected": False}
+        return {"connected": False, "stripe_configured": stripe_configured}
     return {
         "connected": True,
         "account_id": data.get("stripe_account_id"),
+        "stripe_configured": stripe_configured,
     }
 
 

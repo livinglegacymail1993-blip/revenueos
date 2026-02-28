@@ -14,20 +14,31 @@
     .nav a:hover{color:#635bff}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;margin-top:1.5rem}
     @media (max-width:768px){.grid{grid-template-columns:1fr}}
-    .card{background:#fff;border:1px solid #e6e9ec;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.04);padding:1.5rem}
-    .card-title{margin:0 0 1rem;font-size:0.9375rem;font-weight:600;color:#374151}
-    .btn{padding:0.5rem 1rem;font-size:0.875rem;font-weight:500;border-radius:6px;border:none;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block}
+    .card{background:#fff;border:1px solid #e6e9ec;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.04);padding:1.5rem;margin-bottom:1rem}
+    .card:last-child{margin-bottom:0}
+    .card-title{font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;color:#6b7280;margin:0 0 1rem;padding-bottom:0.5rem;border-bottom:1px solid #f3f4f6}
+    .btn{padding:0.5rem 1rem;font-size:0.875rem;font-weight:500;border-radius:6px;border:none;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;min-height:36px;line-height:1.2}
     .btn-primary{background:#635bff;color:#fff}
     .btn-primary:hover:not(:disabled){background:#5851e6}
     .btn-secondary{background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}
     .btn-secondary:hover:not(:disabled){background:#e5e7eb}
     .btn:disabled{opacity:0.6;cursor:not-allowed}
-    .btn+ .btn{margin-left:0.5rem;margin-top:0.25rem}
+    .btn-row{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;margin-top:0.5rem}
     .chip{font-size:0.75rem;font-weight:500;padding:0.25rem 0.5rem;border-radius:4px;display:inline-block}
     .chip-green{background:#d1fae5;color:#065f46}
     .chip-gray{background:#f3f4f6;color:#6b7280}
     .chip-amber{background:#fef3c7;color:#92400e}
     .chip-red{background:#fee2e2;color:#991b1b}
+    .chip-safe{background:#ecfdf5;color:#047857;font-size:0.6875rem}
+    .trust-copy{font-size:0.8125rem;color:#6b7280;line-height:1.5;margin:1rem 0 0;padding:0.75rem;background:#f9fafb;border-radius:6px;border:1px solid #f3f4f6}
+    .trust-copy p{margin:0.35rem 0}
+    .trust-copy p:first-child{margin-top:0}
+    .trust-copy p:last-child{margin-bottom:0}
+    .banner{background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.875rem;color:#92400e}
+    .banner a{color:#b45309;font-weight:500}
+    .empty-state{margin:1rem 0;text-align:center;padding:1.5rem 1rem}
+    .empty-state .empty-title{font-size:1rem;font-weight:600;color:#374151;margin:0 0 0.35rem}
+    .empty-state .empty-sub{font-size:0.875rem;color:#6b7280;margin:0;line-height:1.5}
     .operator-summary{font-size:1rem;color:#374151;line-height:1.6;margin:0 0 1rem;padding:1rem;background:#f9fafb;border-radius:6px;border-left:4px solid #635bff}
     .priority-statement{font-size:0.9375rem;font-weight:600;color:#1e40af;margin:0 0 1rem}
     .constraint-block{margin:1rem 0}
@@ -44,12 +55,11 @@
     .error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:0.75rem;margin:1rem 0;font-size:0.875rem;color:#991b1b}
     .spinner{display:inline-block;width:0.9em;height:0.9em;border:2px solid #e5e7eb;border-top-color:#635bff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:-0.15em;margin-right:0.35em}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .disclaimer{font-size:0.75rem;color:#b45309;margin-top:0.5rem}
     .advanced{margin-top:1.25rem;padding-top:1rem;border-top:1px solid #e6e9ec}
     .advanced summary{cursor:pointer;font-size:0.8125rem;color:#6b7280;font-weight:500}
     .advanced pre{background:#1f2937;color:#e5e7eb;padding:1rem;border-radius:6px;font-size:0.75rem;overflow:auto;max-height:300px;margin-top:0.5rem;white-space:pre-wrap;word-break:break-word}
     .actions-row{display:flex;flex-wrap:wrap;gap:0.5rem;margin:1rem 0}
-    .placeholder{color:#9ca3af;font-size:0.875rem;padding:1rem 0}
+    .results-status{margin-bottom:0.75rem}
   </style>
 </head>
 <body>
@@ -63,29 +73,47 @@
   </nav>
 
   <main class="container">
+    <div id="stripeNotConfiguredBanner" class="banner" style="display:none">
+      Stripe Connect is not configured for this deployment. You can still run the Demo.
+      <a href="/security">Learn more</a>
+    </div>
     <div class="grid">
       <div>
         <div class="card">
           <h2 class="card-title">Stripe Connection</h2>
           <div id="connectionStatus">
-            <span class="chip chip-gray">Checking…</span>
+            <span class="chip chip-gray">Not connected</span>
           </div>
           <p id="connectionAccount" style="font-size:0.875rem;color:#6b7280;margin:0.5rem 0 0;display:none"></p>
-          <div id="connectionActions" style="margin-top:0.75rem"></div>
+          <div id="connectionActions" class="btn-row">
+            <a href="/connect/stripe" class="btn btn-primary">Connect Stripe</a>
+          </div>
+          <div class="trust-copy">
+            <p>Read-only access. RevenueOS never creates charges, refunds, customers, or payouts.</p>
+            <p>You can revoke access anytime in Stripe: Connect → Account connections.</p>
+          </div>
         </div>
-        <div class="card" style="margin-top:1rem">
+        <div class="card">
           <h2 class="card-title">Run Analysis</h2>
-          <button type="button" id="runLive" class="btn btn-primary" disabled>Run Live Analysis</button>
-          <button type="button" id="runDemo" class="btn btn-secondary">Run One-Time Demo</button>
-          <p class="disclaimer">Recommended: Connect via Stripe OAuth. Never paste live keys.</p>
+          <div class="btn-row">
+            <button type="button" id="runLive" class="btn btn-primary" disabled>Run Live Analysis</button>
+            <span class="chip chip-safe">Safe Demo</span>
+            <button type="button" id="runDemo" class="btn btn-secondary">Run One-Time Demo</button>
+          </div>
         </div>
       </div>
       <div class="card">
         <h2 class="card-title">Results</h2>
+        <div class="results-status">
+          <span id="resultsChip" class="chip chip-gray">Ready</span>
+        </div>
         <div id="errorBox"></div>
         <div id="loadingState" style="display:none"><span class="spinner"></span> Running…</div>
         <div id="resultsContent">
-          <p class="placeholder">Connect Stripe and run Live Analysis, or run One-Time Demo to see results.</p>
+          <div class="empty-state">
+            <p class="empty-title">No analysis yet</p>
+            <p class="empty-sub">Run Demo (no Stripe needed) or Connect Stripe to analyze live data.</p>
+          </div>
         </div>
         <div id="successActions" class="actions-row" style="display:none">
           <button type="button" id="copyFormatted" class="btn btn-secondary">Copy formatted report</button>
@@ -101,12 +129,14 @@
 
   <script>
 (function(){
+  const stripeNotConfiguredBanner = document.getElementById('stripeNotConfiguredBanner');
   const connectionStatus = document.getElementById('connectionStatus');
   const connectionAccount = document.getElementById('connectionAccount');
   const connectionActions = document.getElementById('connectionActions');
   const runLive = document.getElementById('runLive');
   const runDemo = document.getElementById('runDemo');
   const errorBox = document.getElementById('errorBox');
+  const resultsChip = document.getElementById('resultsChip');
   const loadingState = document.getElementById('loadingState');
   const resultsContent = document.getElementById('resultsContent');
   const successActions = document.getElementById('successActions');
@@ -124,16 +154,27 @@
     return d.innerHTML;
   }
 
+  function setResultsChip(label, cls){
+    resultsChip.textContent = label;
+    resultsChip.className = 'chip ' + (cls || 'chip-gray');
+  }
+
   function setLoading(loading){
     runLive.disabled = loading || !connected;
     runDemo.disabled = loading;
     loadingState.style.display = loading ? 'block' : 'none';
-    if(!loading) resultsContent.style.display = 'block';
+    if (!loading) resultsContent.style.display = 'block';
+    if (loading) setResultsChip('Running…', 'chip-amber');
   }
 
   function showError(msg){
     errorBox.innerHTML = msg ? '<div class="error-box">' + esc(msg) + '</div>' : '';
     errorBox.style.display = msg ? 'block' : 'none';
+  }
+
+  function renderEmptyState(){
+    resultsContent.innerHTML = '<div class="empty-state"><p class="empty-title">No analysis yet</p><p class="empty-sub">Run Demo (no Stripe needed) or Connect Stripe to analyze live data.</p></div>';
+    rawJsonPre.textContent = '';
   }
 
   function renderResults(data){
@@ -174,13 +215,14 @@
       });
       html += '</ul>';
     }
-    resultsContent.innerHTML = html || '<p class="placeholder">No results.</p>';
+    resultsContent.innerHTML = html || '<div class="empty-state"><p class="empty-title">No analysis yet</p><p class="empty-sub">Run Demo or Connect Stripe to see results.</p></div>';
     rawJsonPre.textContent = JSON.stringify(data, null, 2);
   }
 
   function onResult(data){
     showError('');
     setLoading(false);
+    setResultsChip('Ready', 'chip-green');
     lastFormatted = (data.formatted != null) ? String(data.formatted) : '';
     lastReport = data.report || null;
     renderResults(data);
@@ -192,6 +234,11 @@
       .then(function(r){ return r.json(); })
       .then(function(d){
         connected = d.connected === true;
+        if (d.stripe_configured === false) {
+          stripeNotConfiguredBanner.style.display = 'block';
+        } else {
+          stripeNotConfiguredBanner.style.display = 'none';
+        }
         if (connected) {
           connectionStatus.innerHTML = '<span class="chip chip-green">Monitoring Active</span>';
           if (d.account_id) {
@@ -203,11 +250,18 @@
         } else {
           connectionStatus.innerHTML = '<span class="chip chip-gray">Not connected</span>';
           connectionAccount.style.display = 'none';
-          connectionActions.innerHTML = '<a href="/connect/stripe" class="btn btn-primary">Connect Stripe</a>';
+          if (d.stripe_configured !== false) {
+            connectionActions.innerHTML = '<a href="/connect/stripe" class="btn btn-primary">Connect Stripe</a>';
+          } else {
+            connectionActions.innerHTML = '';
+          }
           runLive.disabled = true;
         }
       })
-      .catch(function(){ connectionStatus.innerHTML = '<span class="chip chip-red">Error</span>'; });
+      .catch(function(){
+        connectionStatus.innerHTML = '<span class="chip chip-red">Error</span>';
+        stripeNotConfiguredBanner.style.display = 'none';
+      });
   }
 
   runDemo.addEventListener('click', function(){
@@ -219,10 +273,10 @@
     fetch('/analyze/demo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', credentials: 'same-origin' })
       .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, data: j }; }); })
       .then(function(o){
-        if (!o.ok) { showError(o.data.detail || 'Request failed'); setLoading(false); resultsContent.innerHTML = '<p class="placeholder">Request failed.</p>'; return; }
+        if (!o.ok) { showError(o.data.detail || 'Request failed'); setLoading(false); setResultsChip('Ready', 'chip-gray'); renderEmptyState(); return; }
         onResult(o.data);
       })
-      .catch(function(e){ showError(e.message); setLoading(false); resultsContent.innerHTML = '<p class="placeholder">Request failed.</p>'; });
+      .catch(function(e){ showError(e.message); setLoading(false); setResultsChip('Ready', 'chip-gray'); renderEmptyState(); });
   });
 
   runLive.addEventListener('click', function(){
@@ -235,10 +289,10 @@
     fetch('/analyze/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', credentials: 'same-origin' })
       .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, data: j }; }); })
       .then(function(o){
-        if (!o.ok) { showError(o.data.detail || 'Request failed'); setLoading(false); resultsContent.innerHTML = '<p class="placeholder">Request failed.</p>'; return; }
+        if (!o.ok) { showError(o.data.detail || 'Request failed'); setLoading(false); setResultsChip('Ready', 'chip-gray'); renderEmptyState(); return; }
         onResult(o.data);
       })
-      .catch(function(e){ showError(e.message); setLoading(false); resultsContent.innerHTML = '<p class="placeholder">Request failed.</p>'; });
+      .catch(function(e){ showError(e.message); setLoading(false); setResultsChip('Ready', 'chip-gray'); renderEmptyState(); });
   });
 
   copyFormattedBtn.addEventListener('click', function(){
@@ -258,7 +312,10 @@
   var params = new URLSearchParams(window.location.search);
   if (params.get('error') === 'oauth_denied') showError('Stripe connection was cancelled.');
   if (params.get('error') === 'token_exchange_failed') showError('Stripe token exchange failed. Try again.');
-  if (params.get('error') === 'stripe_not_configured') showError('Stripe Connect is not configured on this server.');
+  if (params.get('error') === 'stripe_not_configured') {
+    showError('Stripe Connect is not configured on this server.');
+    stripeNotConfiguredBanner.style.display = 'block';
+  }
 })();
   </script>
 </body>
