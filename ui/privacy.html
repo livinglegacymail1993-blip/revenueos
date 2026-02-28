@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy — RevenueOS</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;margin:0;background:#f7f8fa;color:#1a1d21;line-height:1.6}
+    .container{max-width:720px;margin:0 auto;padding:0 1.5rem 2rem}
+    .nav{background:#fff;border-bottom:1px solid #e6e9ec;padding:0.75rem 0}
+    .nav .container{display:flex;gap:1.5rem}
+    .nav a{color:#374151;text-decoration:none;font-size:0.9375rem;font-weight:500}
+    .nav a:hover{color:#635bff}
+    h1{font-size:1.5rem;margin:1.5rem 0 0.5rem}
+    h2{font-size:1.125rem;margin:1.5rem 0 0.5rem}
+    p{color:#4b5563;margin:0.5rem 0}
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="/">Home</a>
+      <a href="/console">Console</a>
+      <a href="/docs">Docs</a>
+      <a href="/security">Security</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h1>Privacy Policy</h1>
+    <p>Last updated: 2025. This policy describes how RevenueOS (“we”) handles information in connection with our service.</p>
+    <h2>Information we do not collect</h2>
+    <p>We do not ask for or store your Stripe password. We do not store Stripe API keys. Access to your Stripe data is granted via Stripe Connect OAuth only.</p>
+    <h2>OAuth and session data</h2>
+    <p>When you connect Stripe via Connect OAuth, we receive an access token from Stripe. In this MVP, OAuth tokens are stored in memory only (not on disk or in a database). They are not logged. We will move to encrypted, persistent storage in a future release and will update this policy accordingly.</p>
+    <h2>Revocation</h2>
+    <p>You can revoke RevenueOS’s access to your Stripe account at any time from your Stripe Dashboard (Connect → Account connections). Revoking access invalidates our token; we will no longer be able to read your Stripe data.</p>
+    <h2>Data we process</h2>
+    <p>We use Stripe data (e.g. subscriptions) only to compute metrics and generate your operator report. We do not sell or share your data with third parties for marketing. We use minimal, read-only scopes where possible.</p>
+    <h2>Contact</h2>
+    <p>For privacy questions, contact the operator of this deployment.</p>
+  </main>
+</body>
+</html>

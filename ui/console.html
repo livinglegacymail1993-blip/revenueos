@@ -3,428 +3,91 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RevenueOS Operator Console</title>
+  <title>RevenueOS Console</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    body {
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      margin: 0;
-      background: #f7f8fa;
-      color: #1a1d21;
-      line-height: 1.5;
-      min-height: 100vh;
-    }
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 1.5rem 2rem;
-    }
-    .header-bar {
-      background: #fff;
-      border-bottom: 1px solid #e6e9ec;
-      padding: 1rem 0;
-    }
-    .header-bar .container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-    .header-bar .brand {
-      flex: 1;
-      min-width: 0;
-    }
-    .header-bar h1 {
-      margin: 0;
-      font-size: 1.375rem;
-      font-weight: 700;
-      color: #1a1d21;
-    }
-    .header-bar .subtitle {
-      font-size: 0.875rem;
-      color: #6b7280;
-      margin: 0.125rem 0 0 0;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.2rem 0.5rem;
-      font-size: 0.6875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      border-radius: 4px;
-      flex-shrink: 0;
-    }
-    .badge-demo {
-      background: #f3f4f6;
-      color: #6b7280;
-    }
-    .badge-active {
-      background: #d1fae5;
-      color: #065f46;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      align-items: start;
-      margin-top: 1.5rem;
-    }
-    @media (max-width: 768px) {
-      .grid { grid-template-columns: 1fr; }
-    }
-    .card {
-      background: #fff;
-      border: 1px solid #e6e9ec;
-      border-radius: 8px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-      padding: 1.5rem;
-    }
-    .card-title {
-      margin: 0 0 1.25rem;
-      font-size: 0.9375rem;
-      font-weight: 600;
-      color: #374151;
-    }
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    .form-group label {
-      display: block;
-      font-size: 0.8125rem;
-      font-weight: 500;
-      color: #4b5563;
-      margin-bottom: 0.35rem;
-    }
-    .form-group select,
-    .form-group input[type="password"] {
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      font-size: 0.875rem;
-      color: #1a1d21;
-      background: #fff;
-    }
-    .form-group select:focus,
-    .form-group input:focus {
-      outline: none;
-      border-color: #635bff;
-      box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.15);
-    }
-    .btn {
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .btn-primary {
-      background: #635bff;
-      color: #fff;
-    }
-    .btn-primary:hover:not(:disabled) {
-      background: #5851e6;
-    }
-    .btn-secondary {
-      background: #f3f4f6;
-      color: #374151;
-      border: 1px solid #e5e7eb;
-    }
-    .btn-secondary:hover:not(:disabled) {
-      background: #e5e7eb;
-    }
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .btn + .btn { margin-left: 0.5rem; margin-top: 0.25rem; }
-    .helper {
-      font-size: 0.75rem;
-      color: #6b7280;
-      margin-top: 0.35rem;
-    }
-    .helper.warning { color: #b45309; }
-    .divider {
-      height: 1px;
-      background: #e6e9ec;
-      margin: 1.25rem 0;
-    }
-    .monitoring-status {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
-      padding: 0.75rem 1rem;
-      margin-bottom: 1rem;
-      font-size: 0.8125rem;
-    }
-    .monitoring-status .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 0.25rem;
-    }
-    .monitoring-status .row:last-child { margin-bottom: 0; }
-    .monitoring-status .label { color: #6b7280; }
-    .monitoring-status .value { font-weight: 500; color: #374151; }
-    .status-chips {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .chip {
-      font-size: 0.75rem;
-      font-weight: 500;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-    }
-    .chip-loading { background: #fef3c7; color: #92400e; }
-    .chip-ready { background: #d1fae5; color: #065f46; }
-    .chip-error { background: #fee2e2; color: #991b1b; }
-    .chip-idle { background: #f3f4f6; color: #6b7280; }
-    .constraint-heading {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #374151;
-      margin: 0 0 0.5rem 0;
-    }
-    .constraint-type {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #1a1d21;
-      margin: 0 0 0.5rem 0;
-      text-transform: capitalize;
-    }
-    .constraint-type span {
-      display: inline-block;
-      padding: 0.25rem 0.5rem;
-      background: #fef3c7;
-      color: #92400e;
-      border-radius: 6px;
-    }
-    .confidence-badge {
-      display: inline-block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      margin-bottom: 1rem;
-    }
-    .confidence-high { background: #d1fae5; color: #065f46; }
-    .confidence-medium { background: #fef3c7; color: #92400e; }
-    .confidence-low { background: #fee2e2; color: #991b1b; }
-    .business-summary {
-      font-size: 0.9375rem;
-      color: #4b5563;
-      margin: 0 0 1rem 0;
-      line-height: 1.5;
-    }
-    .callout {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 6px;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1rem;
-      font-size: 0.875rem;
-      color: #1e40af;
-    }
-    .callout .callout-title {
-      font-weight: 600;
-      color: #1e3a8a;
-      margin-bottom: 0.5rem;
-    }
-    .callout .callout-meta {
-      font-size: 0.8125rem;
-      color: #3b82f6;
-      margin-top: 0.35rem;
-    }
-    .section-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      color: #6b7280;
-      margin-bottom: 0.5rem;
-    }
-    .exp-list { list-style: none; padding: 0; margin: 0 0 1rem 0; }
-    .exp-card {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
-      padding: 1rem;
-      margin-bottom: 0.75rem;
-      font-size: 0.8125rem;
-    }
-    .exp-card h3 {
-      margin: 0 0 0.5rem;
-      font-size: 0.9375rem;
-      font-weight: 600;
-      color: #374151;
-    }
-    .exp-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-      margin-bottom: 0.5rem;
-    }
-    .exp-badge {
-      font-size: 0.6875rem;
-      font-weight: 500;
-      padding: 0.2rem 0.45rem;
-      border-radius: 4px;
-      background: #e5e7eb;
-      color: #4b5563;
-    }
-    .exp-card .hypothesis {
-      color: #6b7280;
-      margin-bottom: 0.5rem;
-    }
-    .exp-card details {
-      margin-top: 0.5rem;
-    }
-    .exp-card details summary {
-      cursor: pointer;
-      font-size: 0.75rem;
-      color: #635bff;
-      font-weight: 500;
-    }
-    .exp-card details ul {
-      margin: 0.5rem 0 0 1.25rem;
-      padding: 0;
-    }
-    .exp-card details li { margin-bottom: 0.25rem; }
-    .error-box {
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      border-radius: 6px;
-      padding: 0.75rem 1rem;
-      margin-bottom: 1rem;
-      font-size: 0.875rem;
-      color: #991b1b;
-    }
-    .error-box .status { font-weight: 600; }
-    .spinner {
-      display: inline-block;
-      width: 0.9em;
-      height: 0.9em;
-      border: 2px solid #e5e7eb;
-      border-top-color: #635bff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      vertical-align: -0.15em;
-      margin-right: 0.35rem;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .running-text { color: #6b7280; font-size: 0.875rem; }
-    .results-placeholder {
-      color: #9ca3af;
-      font-size: 0.875rem;
-      padding: 0.5rem 0;
-    }
-    .schedule-footer {
-      margin-top: 1.25rem;
-      padding-top: 1rem;
-      border-top: 1px solid #e6e9ec;
-      font-size: 0.8125rem;
-      color: #6b7280;
-    }
-    .schedule-footer p { margin: 0.25rem 0; }
-    .actions-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .actions-row .btn { margin-left: 0; margin-top: 0; }
-    .advanced {
-      margin-top: 1.25rem;
-      padding-top: 1rem;
-      border-top: 1px solid #e6e9ec;
-    }
-    .advanced summary {
-      cursor: pointer;
-      font-size: 0.8125rem;
-      color: #6b7280;
-      font-weight: 500;
-    }
-    .advanced pre {
-      background: #1f2937;
-      color: #e5e7eb;
-      padding: 1rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      overflow: auto;
-      max-height: 300px;
-      margin-top: 0.5rem;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;margin:0;background:#f7f8fa;color:#1a1d21;line-height:1.5;min-height:100vh}
+    .container{max-width:1100px;margin:0 auto;padding:0 1.5rem 2rem}
+    .nav{background:#fff;border-bottom:1px solid #e6e9ec;padding:0.75rem 0}
+    .nav .container{display:flex;align-items:center;gap:1.5rem}
+    .nav a{color:#374151;text-decoration:none;font-size:0.9375rem;font-weight:500}
+    .nav a:hover{color:#635bff}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;margin-top:1.5rem}
+    @media (max-width:768px){.grid{grid-template-columns:1fr}}
+    .card{background:#fff;border:1px solid #e6e9ec;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.04);padding:1.5rem}
+    .card-title{margin:0 0 1rem;font-size:0.9375rem;font-weight:600;color:#374151}
+    .btn{padding:0.5rem 1rem;font-size:0.875rem;font-weight:500;border-radius:6px;border:none;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block}
+    .btn-primary{background:#635bff;color:#fff}
+    .btn-primary:hover:not(:disabled){background:#5851e6}
+    .btn-secondary{background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}
+    .btn-secondary:hover:not(:disabled){background:#e5e7eb}
+    .btn:disabled{opacity:0.6;cursor:not-allowed}
+    .btn+ .btn{margin-left:0.5rem;margin-top:0.25rem}
+    .chip{font-size:0.75rem;font-weight:500;padding:0.25rem 0.5rem;border-radius:4px;display:inline-block}
+    .chip-green{background:#d1fae5;color:#065f46}
+    .chip-gray{background:#f3f4f6;color:#6b7280}
+    .chip-amber{background:#fef3c7;color:#92400e}
+    .chip-red{background:#fee2e2;color:#991b1b}
+    .operator-summary{font-size:1rem;color:#374151;line-height:1.6;margin:0 0 1rem;padding:1rem;background:#f9fafb;border-radius:6px;border-left:4px solid #635bff}
+    .priority-statement{font-size:0.9375rem;font-weight:600;color:#1e40af;margin:0 0 1rem}
+    .constraint-block{margin:1rem 0}
+    .constraint-block h3{font-size:0.875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;color:#6b7280;margin:0 0 0.5rem}
+    .constraint-type{font-size:1.125rem;font-weight:700;color:#1a1d21}
+    .callout{background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:1rem;margin:1rem 0;font-size:0.9375rem;color:#1e40af}
+    .callout strong{color:#1e3a8a}
+    .exp-list{list-style:none;padding:0;margin:0}
+    .exp-card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:1rem;margin-bottom:0.75rem;font-size:0.875rem}
+    .exp-card h4{margin:0 0 0.5rem;font-size:1rem}
+    .exp-card details{margin-top:0.5rem}
+    .exp-card details summary{cursor:pointer;color:#635bff;font-size:0.8125rem}
+    .exp-card details ul{margin:0.5rem 0 0 1.25rem;padding:0}
+    .error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:0.75rem;margin:1rem 0;font-size:0.875rem;color:#991b1b}
+    .spinner{display:inline-block;width:0.9em;height:0.9em;border:2px solid #e5e7eb;border-top-color:#635bff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:-0.15em;margin-right:0.35em}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .disclaimer{font-size:0.75rem;color:#b45309;margin-top:0.5rem}
+    .advanced{margin-top:1.25rem;padding-top:1rem;border-top:1px solid #e6e9ec}
+    .advanced summary{cursor:pointer;font-size:0.8125rem;color:#6b7280;font-weight:500}
+    .advanced pre{background:#1f2937;color:#e5e7eb;padding:1rem;border-radius:6px;font-size:0.75rem;overflow:auto;max-height:300px;margin-top:0.5rem;white-space:pre-wrap;word-break:break-word}
+    .actions-row{display:flex;flex-wrap:wrap;gap:0.5rem;margin:1rem 0}
+    .placeholder{color:#9ca3af;font-size:0.875rem;padding:1rem 0}
   </style>
 </head>
 <body>
-  <header class="header-bar">
+  <nav class="nav">
     <div class="container">
-      <div class="brand">
-        <h1>RevenueOS</h1>
-        <p class="subtitle">Continuous AI Revenue Monitoring</p>
-      </div>
-      <span id="headerBadge" class="badge badge-demo">Demo Mode</span>
+      <a href="/">Home</a>
+      <a href="/console">Console</a>
+      <a href="/docs">Docs</a>
+      <a href="/security">Security</a>
     </div>
-  </header>
+  </nav>
 
   <main class="container">
     <div class="grid">
-      <div class="card">
-        <h2 class="card-title">Run Analysis</h2>
-        <div class="form-group">
-          <label for="scenario">Demo Scenario</label>
-          <select id="scenario">
-            <option value="">— None —</option>
-            <option value="revenue_decline">revenue_decline</option>
-            <option value="churn">churn</option>
-            <option value="trial_conversion">trial_conversion</option>
-            <option value="activation">activation</option>
-          </select>
+      <div>
+        <div class="card">
+          <h2 class="card-title">Stripe Connection</h2>
+          <div id="connectionStatus">
+            <span class="chip chip-gray">Checking…</span>
+          </div>
+          <p id="connectionAccount" style="font-size:0.875rem;color:#6b7280;margin:0.5rem 0 0;display:none"></p>
+          <div id="connectionActions" style="margin-top:0.75rem"></div>
         </div>
-        <button type="button" id="runDemo" class="btn btn-primary">Run One-Time Simulation</button>
-
-        <div class="divider"></div>
-
-        <div class="form-group">
-          <label for="stripeKey">Stripe API key</label>
-          <input type="password" id="stripeKey" placeholder="sk_test_..." autocomplete="off">
-          <p class="helper warning">Use test keys. Never paste live keys into a demo.</p>
+        <div class="card" style="margin-top:1rem">
+          <h2 class="card-title">Run Analysis</h2>
+          <button type="button" id="runLive" class="btn btn-primary" disabled>Run Live Analysis</button>
+          <button type="button" id="runDemo" class="btn btn-secondary">Run One-Time Demo</button>
+          <p class="disclaimer">Recommended: Connect via Stripe OAuth. Never paste live keys.</p>
         </div>
-        <button type="button" id="runStripe" class="btn btn-secondary">Connect &amp; Start Monitoring</button>
       </div>
-
       <div class="card">
         <h2 class="card-title">Results</h2>
-        <div id="monitoringStatus" class="monitoring-status" style="display: none;">
-          <div class="row"><span class="label">Monitoring Status:</span> <span id="monitoringStatusValue" class="value">Demo</span></div>
-          <div class="row"><span class="label">Last Analysis:</span> <span id="lastAnalysisValue" class="value">—</span></div>
-          <div class="row"><span class="label">Data Source:</span> <span id="dataSourceValue" class="value">—</span></div>
-        </div>
-        <div class="status-chips">
-          <span id="statusChip" class="chip chip-idle">Ready</span>
-        </div>
         <div id="errorBox"></div>
-        <div id="loadingState" class="running-text" style="display: none;">
-          <span class="spinner"></span> Running…
-        </div>
+        <div id="loadingState" style="display:none"><span class="spinner"></span> Running…</div>
         <div id="resultsContent">
-          <p class="results-placeholder">Run One-Time Simulation or Connect &amp; Start Monitoring to see results.</p>
+          <p class="placeholder">Connect Stripe and run Live Analysis, or run One-Time Demo to see results.</p>
         </div>
-        <div id="scheduleFooter" class="schedule-footer" style="display: none;">
-          <p><strong>Next Scheduled Analysis:</strong> Weekly</p>
-          <p><strong>Delivery:</strong> Operator Report</p>
-        </div>
-        <div id="successActions" class="actions-row" style="display: none;">
+        <div id="successActions" class="actions-row" style="display:none">
           <button type="button" id="copyFormatted" class="btn btn-secondary">Copy formatted report</button>
           <button type="button" id="downloadJson" class="btn btn-secondary">Download JSON</button>
         </div>
@@ -437,277 +100,166 @@
   </main>
 
   <script>
-    (function () {
-      const runDemoBtn = document.getElementById('runDemo');
-      const runStripeBtn = document.getElementById('runStripe');
-      const scenarioSelect = document.getElementById('scenario');
-      const stripeKeyInput = document.getElementById('stripeKey');
-      const headerBadge = document.getElementById('headerBadge');
-      const monitoringStatus = document.getElementById('monitoringStatus');
-      const monitoringStatusValue = document.getElementById('monitoringStatusValue');
-      const lastAnalysisValue = document.getElementById('lastAnalysisValue');
-      const dataSourceValue = document.getElementById('dataSourceValue');
-      const statusChip = document.getElementById('statusChip');
-      const errorBox = document.getElementById('errorBox');
-      const loadingState = document.getElementById('loadingState');
-      const resultsContent = document.getElementById('resultsContent');
-      const scheduleFooter = document.getElementById('scheduleFooter');
-      const successActions = document.getElementById('successActions');
-      const copyFormattedBtn = document.getElementById('copyFormatted');
-      const downloadJsonBtn = document.getElementById('downloadJson');
-      const rawJsonPre = document.getElementById('rawJson');
+(function(){
+  const connectionStatus = document.getElementById('connectionStatus');
+  const connectionAccount = document.getElementById('connectionAccount');
+  const connectionActions = document.getElementById('connectionActions');
+  const runLive = document.getElementById('runLive');
+  const runDemo = document.getElementById('runDemo');
+  const errorBox = document.getElementById('errorBox');
+  const loadingState = document.getElementById('loadingState');
+  const resultsContent = document.getElementById('resultsContent');
+  const successActions = document.getElementById('successActions');
+  const copyFormattedBtn = document.getElementById('copyFormatted');
+  const downloadJsonBtn = document.getElementById('downloadJson');
+  const rawJsonPre = document.getElementById('rawJson');
 
-      let lastFormatted = '';
-      let lastReport = null;
-      let monitoringMode = 'demo';
-      let lastAnalysisTime = null;
-      let lastDataSource = null;
+  let lastFormatted = '';
+  let lastReport = null;
+  let connected = false;
 
-      function updateHeaderBadge() {
-        if (monitoringMode === 'active') {
-          headerBadge.textContent = 'Monitoring Active';
-          headerBadge.className = 'badge badge-active';
-        } else {
-          headerBadge.textContent = 'Demo Mode';
-          headerBadge.className = 'badge badge-demo';
+  function esc(s){
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function setLoading(loading){
+    runLive.disabled = loading || !connected;
+    runDemo.disabled = loading;
+    loadingState.style.display = loading ? 'block' : 'none';
+    if(!loading) resultsContent.style.display = 'block';
+  }
+
+  function showError(msg){
+    errorBox.innerHTML = msg ? '<div class="error-box">' + esc(msg) + '</div>' : '';
+    errorBox.style.display = msg ? 'block' : 'none';
+  }
+
+  function renderResults(data){
+    const report = data.report || {};
+    const primary = report.primary_constraint;
+    const experiments = report.recommended_experiments || [];
+    let html = '';
+
+    if (report.operator_summary) {
+      html += '<div class="operator-summary">' + esc(report.operator_summary) + '</div>';
+    }
+    if (report.priority_statement) {
+      html += '<p class="priority-statement">' + esc(report.priority_statement) + '</p>';
+    }
+    if (primary) {
+      html += '<div class="constraint-block"><h3>Primary constraint</h3>';
+      html += '<p class="constraint-type">' + esc((primary.constraint_type || '').replace(/_/g, ' ')) + '</p>';
+      html += '<span class="chip chip-amber">' + esc(String(primary.affected_metric || '')) + '</span> ';
+      if (primary.confidence_score != null) html += '<span class="chip chip-gray">Confidence: ' + esc(String(primary.confidence_score)) + '</span>';
+      html += '</div>';
+    }
+    if (report.next_action) {
+      html += '<div class="callout"><strong>Next action</strong><br>' + esc(report.next_action) + '</div>';
+    }
+    if (experiments.length) {
+      html += '<h3 style="font-size:0.875rem;margin:1rem 0 0.5rem">Recommended experiments</h3><ul class="exp-list">';
+      experiments.slice(0, 3).forEach(function(exp){
+        html += '<li class="exp-card"><h4>' + esc(exp.title || '') + '</h4>';
+        if (exp.expected_impact_range) html += '<span class="chip chip-gray">' + esc(exp.expected_impact_range) + '</span> ';
+        if (exp.effort != null) html += '<span class="chip chip-gray">Effort: ' + esc(String(exp.effort)) + '</span>';
+        if (exp.hypothesis) html += '<p style="margin:0.5rem 0 0">' + esc(exp.hypothesis) + '</p>';
+        if (exp.implementation_steps && exp.implementation_steps.length) {
+          html += '<details><summary>Steps</summary><ul>';
+          exp.implementation_steps.forEach(function(step){ html += '<li>' + esc(step) + '</li>'; });
+          html += '</ul></details>';
         }
-      }
+        html += '</li>';
+      });
+      html += '</ul>';
+    }
+    resultsContent.innerHTML = html || '<p class="placeholder">No results.</p>';
+    rawJsonPre.textContent = JSON.stringify(data, null, 2);
+  }
 
-      function formatTimestamp(d) {
-        return d.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
-      }
+  function onResult(data){
+    showError('');
+    setLoading(false);
+    lastFormatted = (data.formatted != null) ? String(data.formatted) : '';
+    lastReport = data.report || null;
+    renderResults(data);
+    successActions.style.display = 'block';
+  }
 
-      function setStatus(kind, label) {
-        statusChip.className = 'chip chip-' + kind;
-        statusChip.textContent = label;
-      }
-
-      function setLoading(loading) {
-        runDemoBtn.disabled = loading;
-        runStripeBtn.disabled = loading;
-        loadingState.style.display = loading ? 'block' : 'none';
-        if (!loading) resultsContent.style.display = 'block';
-        if (loading) {
-          setStatus('loading', 'Loading');
-          successActions.style.display = 'none';
-        }
-      }
-
-      function showError(status, message) {
-        errorBox.innerHTML = status
-          ? '<div class="error-box"><span class="status">' + escapeHtml(String(status)) + '</span> ' + escapeHtml(String(message)) + '</div>'
-          : '';
-        errorBox.style.display = status ? 'block' : 'none';
-      }
-
-      function escapeHtml(s) {
-        const div = document.createElement('div');
-        div.textContent = s;
-        return div.innerHTML;
-      }
-
-      function confidenceLevel(score) {
-        if (score == null) return 'Low';
-        var s = Number(score);
-        if (s >= 0.7) return 'High';
-        if (s >= 0.3) return 'Medium';
-        return 'Low';
-      }
-
-      function confidenceClass(level) {
-        if (level === 'High') return 'confidence-high';
-        if (level === 'Medium') return 'confidence-medium';
-        return 'confidence-low';
-      }
-
-      function renderResults(data, dataSource) {
-        const report = data.report || {};
-        const primary = report.primary_constraint;
-        const nextAction = report.next_action || '';
-        const experiments = report.recommended_experiments || [];
-        const topExperiment = experiments[0];
-
-        monitoringStatus.style.display = 'block';
-        monitoringStatusValue.textContent = monitoringMode === 'active' ? 'Active' : 'Demo';
-        lastAnalysisValue.textContent = lastAnalysisTime ? formatTimestamp(lastAnalysisTime) : '—';
-        dataSourceValue.textContent = lastDataSource || '—';
-        scheduleFooter.style.display = 'block';
-
-        let html = '';
-
-        if (primary) {
-          var cType = (primary.constraint_type || 'constraint').replace(/_/g, ' ');
-          var cMetric = primary.affected_metric || 'revenue metrics';
-          html += '<p class="business-summary">RevenueOS detected ' + escapeHtml(cType) + ' impacting ' + escapeHtml(cMetric) + '. Immediate action recommended.</p>';
-          html += '<h3 class="constraint-heading">Primary Growth Constraint</h3>';
-          html += '<p class="constraint-type"><span>' + escapeHtml(cType) + '</span></p>';
-          var confScore = primary.confidence_score != null ? primary.confidence_score : 0;
-          var confLevel = confidenceLevel(confScore);
-          html += '<span class="confidence-badge ' + confidenceClass(confLevel) + '">Confidence: ' + confLevel + '</span>';
-        } else {
-          html += '<p class="section-label">Primary Growth Constraint</p>';
-          html += '<p class="results-placeholder">No primary constraint detected.</p>';
-        }
-
-        if (nextAction && topExperiment) {
-          html += '<p class="section-label">Recommended Immediate Action</p>';
-          html += '<div class="callout">';
-          html += '<div class="callout-title">' + escapeHtml(topExperiment.title || '—') + '</div>';
-          html += escapeHtml(nextAction);
-          html += '<div class="callout-meta">';
-          if (topExperiment.expected_impact_range) html += 'Expected impact: ' + escapeHtml(topExperiment.expected_impact_range);
-          if (topExperiment.effort != null) html += ' &middot; Effort: ' + escapeHtml(String(topExperiment.effort));
-          html += '</div></div>';
-        } else if (nextAction) {
-          html += '<p class="section-label">Recommended Immediate Action</p>';
-          html += '<div class="callout"><strong>Next action</strong><br>' + escapeHtml(nextAction) + '</div>';
-        }
-
-        if (experiments.length > 0) {
-          html += '<p class="section-label">Recommended experiments</p>';
-          html += '<ul class="exp-list">';
-          experiments.slice(0, 3).forEach(function (exp) {
-            html += '<li class="exp-card">';
-            html += '<h3>' + escapeHtml(exp.title || '—') + '</h3>';
-            html += '<div class="exp-badges">';
-            if (exp.expected_impact_range) {
-              html += '<span class="exp-badge">Impact: ' + escapeHtml(exp.expected_impact_range) + '</span>';
-            }
-            if (exp.effort != null) {
-              html += '<span class="exp-badge">Effort: ' + escapeHtml(String(exp.effort)) + '</span>';
-            }
-            html += '</div>';
-            if (exp.hypothesis) {
-              html += '<div class="hypothesis">' + escapeHtml(exp.hypothesis) + '</div>';
-            }
-            if (exp.implementation_steps && exp.implementation_steps.length > 0) {
-              html += '<details><summary>Implementation steps</summary><ul>';
-              exp.implementation_steps.forEach(function (step) {
-                html += '<li>' + escapeHtml(step) + '</li>';
-              });
-              html += '</ul></details>';
-            }
-            html += '</li>';
-          });
-          html += '</ul>';
-        }
-
-        resultsContent.innerHTML = html || '<p class="results-placeholder">No results to display.</p>';
-        rawJsonPre.textContent = JSON.stringify(data, null, 2);
-      }
-
-      function showResult(data, dataSource) {
-        showError('');
-        setLoading(false);
-        setStatus('ready', 'Ready');
-        lastFormatted = (data.formatted != null) ? String(data.formatted) : '';
-        lastReport = data.report != null ? data.report : null;
-        lastAnalysisTime = new Date();
-        lastDataSource = dataSource;
-        if (dataSource === 'Stripe') {
-          monitoringMode = 'active';
-          updateHeaderBadge();
-        }
-        renderResults(data, dataSource);
-        successActions.style.display = 'block';
-      }
-
-      function copyFormatted() {
-        if (!lastFormatted) return;
-        navigator.clipboard.writeText(lastFormatted).then(function () {
-          copyFormattedBtn.textContent = 'Copied';
-          setTimeout(function () { copyFormattedBtn.textContent = 'Copy formatted report'; }, 2000);
-        }).catch(function () {
-          copyFormattedBtn.textContent = 'Copy failed';
-          setTimeout(function () { copyFormattedBtn.textContent = 'Copy formatted report'; }, 2000);
-        });
-      }
-
-      function downloadJson() {
-        if (!lastReport) return;
-        const blob = new Blob([JSON.stringify(lastReport, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'revenueos-report.json';
-        a.click();
-        URL.revokeObjectURL(a.href);
-      }
-
-      async function doDemo() {
-        showError('');
-        setLoading(true);
-        resultsContent.innerHTML = '';
-        rawJsonPre.textContent = '';
-        lastFormatted = '';
-        lastReport = null;
-        monitoringStatus.style.display = 'none';
-        scheduleFooter.style.display = 'none';
-        try {
-          const r = await fetch('/analyze/demo', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: '{}'
-          });
-          const data = await r.json();
-          if (!r.ok) {
-            setStatus('error', 'Error');
-            showError(r.status, data.detail || r.statusText || 'Request failed');
-            setLoading(false);
-            resultsContent.innerHTML = '<p class="results-placeholder">Request failed.</p>';
-            return;
+  function fetchStatus(){
+    fetch('/connect/status', { credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        connected = d.connected === true;
+        if (connected) {
+          connectionStatus.innerHTML = '<span class="chip chip-green">Monitoring Active</span>';
+          if (d.account_id) {
+            connectionAccount.textContent = 'Connected as ' + d.account_id;
+            connectionAccount.style.display = 'block';
           }
-          showResult(data, 'Demo');
-        } catch (e) {
-          setStatus('error', 'Error');
-          showError('Error', e.message || 'Request failed');
-          setLoading(false);
-          resultsContent.innerHTML = '<p class="results-placeholder">Request failed.</p>';
+          connectionActions.innerHTML = '<form method="post" action="/connect/logout" style="display:inline"><button type="submit" class="btn btn-secondary">Disconnect</button></form>';
+          runLive.disabled = false;
+        } else {
+          connectionStatus.innerHTML = '<span class="chip chip-gray">Not connected</span>';
+          connectionAccount.style.display = 'none';
+          connectionActions.innerHTML = '<a href="/connect/stripe" class="btn btn-primary">Connect Stripe</a>';
+          runLive.disabled = true;
         }
-      }
+      })
+      .catch(function(){ connectionStatus.innerHTML = '<span class="chip chip-red">Error</span>'; });
+  }
 
-      async function doStripe() {
-        const key = (stripeKeyInput.value || '').trim();
-        if (!key) {
-          showError('Validation', 'Enter a Stripe API key.');
-          return;
-        }
-        showError('');
-        setLoading(true);
-        resultsContent.innerHTML = '';
-        rawJsonPre.textContent = '';
-        lastFormatted = '';
-        lastReport = null;
-        monitoringStatus.style.display = 'none';
-        scheduleFooter.style.display = 'none';
-        try {
-          const r = await fetch('/analyze/stripe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ stripe_api_key: key })
-          });
-          const data = await r.json();
-          if (!r.ok) {
-            setStatus('error', 'Error');
-            showError(r.status, data.detail || r.statusText || 'Request failed');
-            setLoading(false);
-            resultsContent.innerHTML = '<p class="results-placeholder">Request failed.</p>';
-            return;
-          }
-          stripeKeyInput.value = '';
-          showResult(data, 'Stripe');
-        } catch (e) {
-          setStatus('error', 'Error');
-          showError('Error', e.message || 'Request failed');
-          setLoading(false);
-          resultsContent.innerHTML = '<p class="results-placeholder">Request failed.</p>';
-        }
-      }
+  runDemo.addEventListener('click', function(){
+    showError('');
+    setLoading(true);
+    resultsContent.innerHTML = '';
+    rawJsonPre.textContent = '';
+    successActions.style.display = 'none';
+    fetch('/analyze/demo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', credentials: 'same-origin' })
+      .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, data: j }; }); })
+      .then(function(o){
+        if (!o.ok) { showError(o.data.detail || 'Request failed'); setLoading(false); resultsContent.innerHTML = '<p class="placeholder">Request failed.</p>'; return; }
+        onResult(o.data);
+      })
+      .catch(function(e){ showError(e.message); setLoading(false); resultsContent.innerHTML = '<p class="placeholder">Request failed.</p>'; });
+  });
 
-      runDemoBtn.addEventListener('click', doDemo);
-      runStripeBtn.addEventListener('click', doStripe);
-      copyFormattedBtn.addEventListener('click', copyFormatted);
-      downloadJsonBtn.addEventListener('click', downloadJson);
-    })();
+  runLive.addEventListener('click', function(){
+    if (!connected) return;
+    showError('');
+    setLoading(true);
+    resultsContent.innerHTML = '';
+    rawJsonPre.textContent = '';
+    successActions.style.display = 'none';
+    fetch('/analyze/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', credentials: 'same-origin' })
+      .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, data: j }; }); })
+      .then(function(o){
+        if (!o.ok) { showError(o.data.detail || 'Request failed'); setLoading(false); resultsContent.innerHTML = '<p class="placeholder">Request failed.</p>'; return; }
+        onResult(o.data);
+      })
+      .catch(function(e){ showError(e.message); setLoading(false); resultsContent.innerHTML = '<p class="placeholder">Request failed.</p>'; });
+  });
+
+  copyFormattedBtn.addEventListener('click', function(){
+    if (!lastFormatted) return;
+    navigator.clipboard.writeText(lastFormatted).then(function(){ copyFormattedBtn.textContent = 'Copied'; setTimeout(function(){ copyFormattedBtn.textContent = 'Copy formatted report'; }, 2000); });
+  });
+  downloadJsonBtn.addEventListener('click', function(){
+    if (!lastReport) return;
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(lastReport, null, 2)], { type: 'application/json' }));
+    a.download = 'revenueos-report.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  fetchStatus();
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('error') === 'oauth_denied') showError('Stripe connection was cancelled.');
+  if (params.get('error') === 'token_exchange_failed') showError('Stripe token exchange failed. Try again.');
+  if (params.get('error') === 'stripe_not_configured') showError('Stripe Connect is not configured on this server.');
+})();
   </script>
 </body>
 </html>

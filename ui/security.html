@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security — RevenueOS</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;margin:0;background:#f7f8fa;color:#1a1d21;line-height:1.6}
+    .container{max-width:720px;margin:0 auto;padding:0 1.5rem 2rem}
+    .nav{background:#fff;border-bottom:1px solid #e6e9ec;padding:0.75rem 0}
+    .nav .container{display:flex;gap:1.5rem}
+    .nav a{color:#374151;text-decoration:none;font-size:0.9375rem;font-weight:500}
+    .nav a:hover{color:#635bff}
+    h1{font-size:1.5rem;margin:1.5rem 0 0.5rem}
+    h2{font-size:1.125rem;margin:1.5rem 0 0.5rem}
+    p{color:#4b5563;margin:0.5rem 0}
+    .highlight{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:1rem;margin:1rem 0}
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="/">Home</a>
+      <a href="/console">Console</a>
+      <a href="/docs">Docs</a>
+      <a href="/security">Security</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h1>Security</h1>
+    <p>RevenueOS is designed with a trust-first, minimal-access approach for financial data.</p>
+    <div class="highlight">
+      <p><strong>We do not store API keys.</strong> OAuth tokens are stored in memory only in this MVP and will move to encrypted storage in a future release.</p>
+    </div>
+    <h2>Stripe access</h2>
+    <p>Access to your Stripe account is granted only via Stripe Connect OAuth. You authorize our application once; Stripe issues a time-limited token. We never see or store your Stripe login credentials.</p>
+    <h2>Revocation</h2>
+    <p>You can revoke RevenueOS’s access at any time from your Stripe Dashboard: go to Connect → Account connections and remove RevenueOS. This immediately invalidates our token; we cannot access your data after that.</p>
+    <h2>Minimal scopes</h2>
+    <p>We request read-only access where possible. We do not perform write operations (charges, refunds, etc.) on your Stripe account. We use the minimum scopes required to compute subscription-based metrics and generate your operator report.</p>
+    <h2>Session cookies</h2>
+    <p>We use a signed session cookie to associate your browser with your connected Stripe token. The cookie is HTTP-only and SameSite. We do not store tokens in local storage or in files.</p>
+    <h2>No database (MVP)</h2>
+    <p>In this MVP we do not use a database. Session and token data exist only in process memory and are lost on restart. This avoids persistence of sensitive data until we implement encrypted storage.</p>
+  </main>
+</body>
+</html>

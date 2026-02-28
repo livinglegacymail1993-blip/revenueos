@@ -1,5 +1,6 @@
 # Render Blueprint: RevenueOS Web Service
 # https://render.com/docs/blueprint-spec
+# Set in Render Dashboard: SECRET_KEY, STRIPE_CLIENT_ID, STRIPE_CLIENT_SECRET, STRIPE_REDIRECT_URI (optional)
 services:
   - type: web
     name: revenueos

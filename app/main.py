@@ -1,28 +1,60 @@
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, Response
 
-from routers import router, analyze_router
+from routers import router, analyze_router, connect_router
 
 app = FastAPI()
 
+_BASE_DIR = Path(__file__).resolve().parent.parent
 
-@app.get("/")
+
+def _read_ui(name: str) -> str:
+    path = _BASE_DIR / "ui" / name
+    return path.read_text(encoding="utf-8")
+
+
+@app.head("/")
+def root_head():
+    """Render health checks (e.g. HEAD /) return 200."""
+    return Response(status_code=200)
+
+
+@app.get("/", response_class=HTMLResponse)
 def root():
-    """Redirect browsers to the Operator Console; API discovery remains at /api/root."""
-    return RedirectResponse(url="/ui", status_code=302)
+    """Landing page."""
+    return HTMLResponse(_read_ui("index.html"))
+
+
+@app.get("/console", response_class=HTMLResponse)
+def console_page():
+    """Operator console."""
+    return HTMLResponse(_read_ui("console.html"))
+
+
+@app.get("/privacy", response_class=HTMLResponse)
+def privacy_page():
+    """Privacy policy."""
+    return HTMLResponse(_read_ui("privacy.html"))
+
+
+@app.get("/security", response_class=HTMLResponse)
+def security_page():
+    """Security posture."""
+    return HTMLResponse(_read_ui("security.html"))
 
 
 @app.get("/api/root")
 def api_root():
-    """API discovery: name, status, docs, demo, ui."""
+    """API discovery."""
     return {
         "name": "RevenueOS",
         "status": "live",
         "docs": "/docs",
-        "demo": "POST /analyze/demo",
-        "ui": "/ui",
+        "console": "/console",
+        "privacy": "/privacy",
+        "security": "/security",
     }
 
 
@@ -31,14 +63,6 @@ def health_check():
     return {"status": "healthy"}
 
 
-@app.get("/ui", response_class=HTMLResponse)
-def ui_console():
-    """Serve the minimal Operator Console UI."""
-    base_dir = Path(__file__).resolve().parent.parent
-    html_path = base_dir / "ui" / "console.html"
-    html = html_path.read_text(encoding="utf-8")
-    return html
-
-
+app.include_router(connect_router)
 app.include_router(router)
 app.include_router(analyze_router)
