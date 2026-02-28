@@ -27,8 +27,13 @@
     .header-bar .container {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       flex-wrap: wrap;
       gap: 0.75rem;
+    }
+    .header-bar .brand {
+      flex: 1;
+      min-width: 0;
     }
     .header-bar h1 {
       margin: 0;
@@ -37,7 +42,6 @@
       color: #1a1d21;
     }
     .header-bar .subtitle {
-      width: 100%;
       font-size: 0.875rem;
       color: #6b7280;
       margin: 0.125rem 0 0 0;
@@ -51,6 +55,13 @@
       text-transform: uppercase;
       letter-spacing: 0.03em;
       border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .badge-demo {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+    .badge-active {
       background: #d1fae5;
       color: #065f46;
     }
@@ -143,6 +154,23 @@
       background: #e6e9ec;
       margin: 1.25rem 0;
     }
+    .monitoring-status {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.8125rem;
+    }
+    .monitoring-status .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 0.25rem;
+    }
+    .monitoring-status .row:last-child { margin-bottom: 0; }
+    .monitoring-status .label { color: #6b7280; }
+    .monitoring-status .value { font-weight: 500; color: #374151; }
     .status-chips {
       display: flex;
       align-items: center;
@@ -159,33 +187,62 @@
     .chip-ready { background: #d1fae5; color: #065f46; }
     .chip-error { background: #fee2e2; color: #991b1b; }
     .chip-idle { background: #f3f4f6; color: #6b7280; }
-    .constraint-table {
-      width: 100%;
-      font-size: 0.8125rem;
-      border-collapse: collapse;
+    .constraint-heading {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #374151;
+      margin: 0 0 0.5rem 0;
+    }
+    .constraint-type {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1a1d21;
+      margin: 0 0 0.5rem 0;
+      text-transform: capitalize;
+    }
+    .constraint-type span {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 6px;
+    }
+    .confidence-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
       margin-bottom: 1rem;
     }
-    .constraint-table th,
-    .constraint-table td {
-      text-align: left;
-      padding: 0.5rem 0.5rem 0.5rem 0;
-      border-bottom: 1px solid #f3f4f6;
-    }
-    .constraint-table th {
-      font-weight: 500;
-      color: #6b7280;
-      width: 38%;
+    .confidence-high { background: #d1fae5; color: #065f46; }
+    .confidence-medium { background: #fef3c7; color: #92400e; }
+    .confidence-low { background: #fee2e2; color: #991b1b; }
+    .business-summary {
+      font-size: 0.9375rem;
+      color: #4b5563;
+      margin: 0 0 1rem 0;
+      line-height: 1.5;
     }
     .callout {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
       border-radius: 6px;
-      padding: 0.75rem 1rem;
+      padding: 1rem 1.25rem;
       margin-bottom: 1rem;
       font-size: 0.875rem;
       color: #1e40af;
     }
-    .callout strong { color: #1e3a8a; }
+    .callout .callout-title {
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 0.5rem;
+    }
+    .callout .callout-meta {
+      font-size: 0.8125rem;
+      color: #3b82f6;
+      margin-top: 0.35rem;
+    }
     .section-label {
       font-size: 0.75rem;
       font-weight: 600;
@@ -269,6 +326,14 @@
       font-size: 0.875rem;
       padding: 0.5rem 0;
     }
+    .schedule-footer {
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e6e9ec;
+      font-size: 0.8125rem;
+      color: #6b7280;
+    }
+    .schedule-footer p { margin: 0.25rem 0; }
     .actions-row {
       display: flex;
       flex-wrap: wrap;
@@ -304,9 +369,11 @@
 <body>
   <header class="header-bar">
     <div class="container">
-      <h1>RevenueOS</h1>
-      <span class="badge">Live</span>
-      <p class="subtitle">Find your #1 revenue constraint and the next best experiments.</p>
+      <div class="brand">
+        <h1>RevenueOS</h1>
+        <p class="subtitle">Continuous AI Revenue Monitoring</p>
+      </div>
+      <span id="headerBadge" class="badge badge-demo">Demo Mode</span>
     </div>
   </header>
 
@@ -324,7 +391,7 @@
             <option value="activation">activation</option>
           </select>
         </div>
-        <button type="button" id="runDemo" class="btn btn-primary">Run Demo</button>
+        <button type="button" id="runDemo" class="btn btn-primary">Run One-Time Simulation</button>
 
         <div class="divider"></div>
 
@@ -333,11 +400,16 @@
           <input type="password" id="stripeKey" placeholder="sk_test_..." autocomplete="off">
           <p class="helper warning">Use test keys. Never paste live keys into a demo.</p>
         </div>
-        <button type="button" id="runStripe" class="btn btn-secondary">Run Stripe Analysis</button>
+        <button type="button" id="runStripe" class="btn btn-secondary">Connect &amp; Start Monitoring</button>
       </div>
 
       <div class="card">
         <h2 class="card-title">Results</h2>
+        <div id="monitoringStatus" class="monitoring-status" style="display: none;">
+          <div class="row"><span class="label">Monitoring Status:</span> <span id="monitoringStatusValue" class="value">Demo</span></div>
+          <div class="row"><span class="label">Last Analysis:</span> <span id="lastAnalysisValue" class="value">—</span></div>
+          <div class="row"><span class="label">Data Source:</span> <span id="dataSourceValue" class="value">—</span></div>
+        </div>
         <div class="status-chips">
           <span id="statusChip" class="chip chip-idle">Ready</span>
         </div>
@@ -346,7 +418,11 @@
           <span class="spinner"></span> Running…
         </div>
         <div id="resultsContent">
-          <p class="results-placeholder">Run Demo or Run Stripe Analysis to see results.</p>
+          <p class="results-placeholder">Run One-Time Simulation or Connect &amp; Start Monitoring to see results.</p>
+        </div>
+        <div id="scheduleFooter" class="schedule-footer" style="display: none;">
+          <p><strong>Next Scheduled Analysis:</strong> Weekly</p>
+          <p><strong>Delivery:</strong> Operator Report</p>
         </div>
         <div id="successActions" class="actions-row" style="display: none;">
           <button type="button" id="copyFormatted" class="btn btn-secondary">Copy formatted report</button>
@@ -366,10 +442,16 @@
       const runStripeBtn = document.getElementById('runStripe');
       const scenarioSelect = document.getElementById('scenario');
       const stripeKeyInput = document.getElementById('stripeKey');
+      const headerBadge = document.getElementById('headerBadge');
+      const monitoringStatus = document.getElementById('monitoringStatus');
+      const monitoringStatusValue = document.getElementById('monitoringStatusValue');
+      const lastAnalysisValue = document.getElementById('lastAnalysisValue');
+      const dataSourceValue = document.getElementById('dataSourceValue');
       const statusChip = document.getElementById('statusChip');
       const errorBox = document.getElementById('errorBox');
       const loadingState = document.getElementById('loadingState');
       const resultsContent = document.getElementById('resultsContent');
+      const scheduleFooter = document.getElementById('scheduleFooter');
       const successActions = document.getElementById('successActions');
       const copyFormattedBtn = document.getElementById('copyFormatted');
       const downloadJsonBtn = document.getElementById('downloadJson');
@@ -377,6 +459,23 @@
 
       let lastFormatted = '';
       let lastReport = null;
+      let monitoringMode = 'demo';
+      let lastAnalysisTime = null;
+      let lastDataSource = null;
+
+      function updateHeaderBadge() {
+        if (monitoringMode === 'active') {
+          headerBadge.textContent = 'Monitoring Active';
+          headerBadge.className = 'badge badge-active';
+        } else {
+          headerBadge.textContent = 'Demo Mode';
+          headerBadge.className = 'badge badge-demo';
+        }
+      }
+
+      function formatTimestamp(d) {
+        return d.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
+      }
 
       function setStatus(kind, label) {
         statusChip.className = 'chip chip-' + kind;
@@ -407,30 +506,60 @@
         return div.innerHTML;
       }
 
-      function renderResults(data) {
+      function confidenceLevel(score) {
+        if (score == null) return 'Low';
+        var s = Number(score);
+        if (s >= 0.7) return 'High';
+        if (s >= 0.3) return 'Medium';
+        return 'Low';
+      }
+
+      function confidenceClass(level) {
+        if (level === 'High') return 'confidence-high';
+        if (level === 'Medium') return 'confidence-medium';
+        return 'confidence-low';
+      }
+
+      function renderResults(data, dataSource) {
         const report = data.report || {};
         const primary = report.primary_constraint;
         const nextAction = report.next_action || '';
         const experiments = report.recommended_experiments || [];
+        const topExperiment = experiments[0];
+
+        monitoringStatus.style.display = 'block';
+        monitoringStatusValue.textContent = monitoringMode === 'active' ? 'Active' : 'Demo';
+        lastAnalysisValue.textContent = lastAnalysisTime ? formatTimestamp(lastAnalysisTime) : '—';
+        dataSourceValue.textContent = lastDataSource || '—';
+        scheduleFooter.style.display = 'block';
 
         let html = '';
 
         if (primary) {
-          html += '<p class="section-label">Primary constraint</p>';
-          html += '<table class="constraint-table"><tbody>';
-          html += '<tr><th>Type</th><td>' + escapeHtml(primary.constraint_type || '—') + '</td></tr>';
-          html += '<tr><th>Metric</th><td>' + escapeHtml(primary.affected_metric || '—') + '</td></tr>';
-          html += '<tr><th>Delta</th><td>' + escapeHtml(primary.delta_percentage != null ? primary.delta_percentage + '%' : '—') + '</td></tr>';
-          html += '<tr><th>Confidence</th><td>' + escapeHtml(primary.confidence_score != null ? String(primary.confidence_score) : '—') + '</td></tr>';
-          html += '<tr><th>Score</th><td>' + escapeHtml(primary.constraint_score != null ? String(primary.constraint_score) : '—') + '</td></tr>';
-          html += '</tbody></table>';
+          var cType = (primary.constraint_type || 'constraint').replace(/_/g, ' ');
+          var cMetric = primary.affected_metric || 'revenue metrics';
+          html += '<p class="business-summary">RevenueOS detected ' + escapeHtml(cType) + ' impacting ' + escapeHtml(cMetric) + '. Immediate action recommended.</p>';
+          html += '<h3 class="constraint-heading">Primary Growth Constraint</h3>';
+          html += '<p class="constraint-type"><span>' + escapeHtml(cType) + '</span></p>';
+          var confScore = primary.confidence_score != null ? primary.confidence_score : 0;
+          var confLevel = confidenceLevel(confScore);
+          html += '<span class="confidence-badge ' + confidenceClass(confLevel) + '">Confidence: ' + confLevel + '</span>';
         } else {
-          html += '<p class="section-label">Primary constraint</p>';
+          html += '<p class="section-label">Primary Growth Constraint</p>';
           html += '<p class="results-placeholder">No primary constraint detected.</p>';
         }
 
-        if (nextAction) {
-          html += '<p class="section-label">Next action</p>';
+        if (nextAction && topExperiment) {
+          html += '<p class="section-label">Recommended Immediate Action</p>';
+          html += '<div class="callout">';
+          html += '<div class="callout-title">' + escapeHtml(topExperiment.title || '—') + '</div>';
+          html += escapeHtml(nextAction);
+          html += '<div class="callout-meta">';
+          if (topExperiment.expected_impact_range) html += 'Expected impact: ' + escapeHtml(topExperiment.expected_impact_range);
+          if (topExperiment.effort != null) html += ' &middot; Effort: ' + escapeHtml(String(topExperiment.effort));
+          html += '</div></div>';
+        } else if (nextAction) {
+          html += '<p class="section-label">Recommended Immediate Action</p>';
           html += '<div class="callout"><strong>Next action</strong><br>' + escapeHtml(nextAction) + '</div>';
         }
 
@@ -467,13 +596,19 @@
         rawJsonPre.textContent = JSON.stringify(data, null, 2);
       }
 
-      function showResult(data) {
+      function showResult(data, dataSource) {
         showError('');
         setLoading(false);
         setStatus('ready', 'Ready');
         lastFormatted = (data.formatted != null) ? String(data.formatted) : '';
         lastReport = data.report != null ? data.report : null;
-        renderResults(data);
+        lastAnalysisTime = new Date();
+        lastDataSource = dataSource;
+        if (dataSource === 'Stripe') {
+          monitoringMode = 'active';
+          updateHeaderBadge();
+        }
+        renderResults(data, dataSource);
         successActions.style.display = 'block';
       }
 
@@ -505,6 +640,8 @@
         rawJsonPre.textContent = '';
         lastFormatted = '';
         lastReport = null;
+        monitoringStatus.style.display = 'none';
+        scheduleFooter.style.display = 'none';
         try {
           const r = await fetch('/analyze/demo', {
             method: 'POST',
@@ -519,7 +656,7 @@
             resultsContent.innerHTML = '<p class="results-placeholder">Request failed.</p>';
             return;
           }
-          showResult(data);
+          showResult(data, 'Demo');
         } catch (e) {
           setStatus('error', 'Error');
           showError('Error', e.message || 'Request failed');
@@ -540,6 +677,8 @@
         rawJsonPre.textContent = '';
         lastFormatted = '';
         lastReport = null;
+        monitoringStatus.style.display = 'none';
+        scheduleFooter.style.display = 'none';
         try {
           const r = await fetch('/analyze/stripe', {
             method: 'POST',
@@ -555,7 +694,7 @@
             return;
           }
           stripeKeyInput.value = '';
-          showResult(data);
+          showResult(data, 'Stripe');
         } catch (e) {
           setStatus('error', 'Error');
           showError('Error', e.message || 'Request failed');
