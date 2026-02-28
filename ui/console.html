@@ -5,61 +5,293 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RevenueOS Operator Console</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
-    h1 { font-size: 1.25rem; margin-bottom: 1rem; }
-    section { margin-bottom: 1.5rem; }
-    label { display: block; margin-bottom: 0.25rem; font-weight: 500; }
-    input[type="password"], select { padding: 0.4rem 0.5rem; width: 100%; max-width: 320px; box-sizing: border-box; }
-    button { padding: 0.5rem 1rem; margin-right: 0.5rem; margin-top: 0.25rem; cursor: pointer; }
-    .warning { font-size: 0.8rem; color: #b45309; margin-top: 0.25rem; }
-    pre { background: #f5f5f5; padding: 1rem; overflow: auto; font-size: 0.85rem; white-space: pre-wrap; }
-    details { margin-top: 0.5rem; }
-    details pre { margin-top: 0.25rem; }
-    #output { margin-top: 1rem; }
-    #error { color: #c00; margin-top: 0.5rem; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 1rem 2rem;
+    }
+    .header {
+      background: #1e293b;
+      color: #f1f5f9;
+      padding: 1rem 0;
+      margin-bottom: 1.5rem;
+    }
+    .header .container {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .header .tagline {
+      font-size: 0.875rem;
+      opacity: 0.85;
+      margin-top: 0.25rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 720px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      padding: 1.25rem;
+    }
+    .card h2 {
+      margin: 0 0 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #334155;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #475569;
+      margin-bottom: 0.35rem;
+    }
+    .form-group select,
+    .form-group input[type="password"] {
+      width: 100%;
+      padding: 0.5rem 0.65rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #3b82f6;
+      color: #fff;
+    }
+    .btn:hover:not(:disabled) {
+      background: #2563eb;
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-secondary {
+      background: #64748b;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: #475569;
+    }
+    .btn + .btn { margin-left: 0.5rem; }
+    .helper {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 0.25rem;
+    }
+    .helper.warning {
+      color: #b45309;
+    }
+    .results-placeholder {
+      color: #94a3b8;
+      font-size: 0.875rem;
+      padding: 1rem 0;
+    }
+    .constraint-table {
+      width: 100%;
+      font-size: 0.8125rem;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    .constraint-table th,
+    .constraint-table td {
+      text-align: left;
+      padding: 0.4rem 0.5rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .constraint-table th {
+      font-weight: 500;
+      color: #64748b;
+      width: 40%;
+    }
+    .callout {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    .callout strong { color: #1e40af; }
+    .exp-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .exp-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.8125rem;
+    }
+    .exp-card .title { font-weight: 600; color: #334155; margin-bottom: 0.25rem; }
+    .exp-card .meta { color: #64748b; margin-bottom: 0.25rem; }
+    .exp-card details { margin-top: 0.35rem; }
+    .exp-card details summary { cursor: pointer; color: #3b82f6; font-size: 0.75rem; }
+    .exp-card details[open] summary { margin-bottom: 0.25rem; }
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      color: #b91c1c;
+    }
+    .error-box .status { font-weight: 600; }
+    .spinner {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border: 2px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: -0.2em;
+      margin-right: 0.35rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #64748b; font-size: 0.875rem; }
+    .advanced {
+      margin-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 1rem;
+    }
+    .advanced summary {
+      cursor: pointer;
+      font-size: 0.8125rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .advanced pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      overflow: auto;
+      max-height: 320px;
+      margin-top: 0.5rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .stripe-section {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+    }
   </style>
 </head>
 <body>
-  <h1>RevenueOS Operator Console</h1>
+  <header class="header">
+    <div class="container">
+      <h1>RevenueOS</h1>
+      <p class="tagline">Revenue constraint detection & experiment recommendations</p>
+    </div>
+  </header>
 
-  <section>
-    <label for="scenario">Scenario (optional)</label>
-    <select id="scenario">
-      <option value="">— None —</option>
-      <option value="revenue_decline">revenue_decline</option>
-      <option value="churn">churn</option>
-      <option value="trial_conversion">trial_conversion</option>
-      <option value="activation">activation</option>
-    </select>
-    <button type="button" id="runDemo">Run Demo</button>
-  </section>
+  <main class="container">
+    <div class="grid">
+      <div class="card">
+        <h2>Run Analysis</h2>
+        <div class="form-group">
+          <label for="scenario">Scenario</label>
+          <select id="scenario">
+            <option value="">— None —</option>
+            <option value="revenue_decline">revenue_decline</option>
+            <option value="churn">churn</option>
+            <option value="trial_conversion">trial_conversion</option>
+            <option value="activation">activation</option>
+          </select>
+        </div>
+        <button type="button" id="runDemo" class="btn">Run Demo</button>
 
-  <section>
-    <label for="stripeKey">Stripe API key (optional)</label>
-    <input type="password" id="stripeKey" placeholder="sk_test_...">
-    <p class="warning">Don't paste live keys. Use test keys.</p>
-    <button type="button" id="runStripe">Run Stripe Analysis</button>
-  </section>
+        <div class="stripe-section">
+          <div class="form-group">
+            <label for="stripeKey">Stripe API key</label>
+            <input type="password" id="stripeKey" placeholder="sk_test_...">
+            <p class="helper warning">Use test keys only. Do not paste live keys.</p>
+          </div>
+          <button type="button" id="runStripe" class="btn btn-secondary">Run Stripe</button>
+        </div>
+      </div>
 
-  <div id="output"></div>
-  <div id="error"></div>
+      <div class="card">
+        <h2>Results</h2>
+        <div id="errorBox"></div>
+        <div id="loadingState" class="loading-text" style="display: none;">
+          <span class="spinner"></span> Loading…
+        </div>
+        <div id="resultsContent">
+          <p class="results-placeholder">Run Demo or Run Stripe to see results.</p>
+        </div>
+        <details class="advanced">
+          <summary>Advanced: raw JSON</summary>
+          <pre id="rawJson"></pre>
+        </details>
+      </div>
+    </div>
+  </main>
 
   <script>
-    const output = document.getElementById('output');
-    const errorEl = document.getElementById('error');
+    const runDemoBtn = document.getElementById('runDemo');
+    const runStripeBtn = document.getElementById('runStripe');
+    const scenarioSelect = document.getElementById('scenario');
+    const stripeKeyInput = document.getElementById('stripeKey');
+    const errorBox = document.getElementById('errorBox');
+    const loadingState = document.getElementById('loadingState');
+    const resultsContent = document.getElementById('resultsContent');
+    const rawJsonPre = document.getElementById('rawJson');
 
-    function showError(msg) {
-      errorEl.textContent = msg || '';
-      errorEl.style.display = msg ? 'block' : 'none';
+    function setLoading(loading) {
+      runDemoBtn.disabled = loading;
+      runStripeBtn.disabled = loading;
+      loadingState.style.display = loading ? 'block' : 'none';
+      if (!loading) resultsContent.style.display = 'block';
     }
 
-    function showResult(data) {
-      showError('');
-      const formatted = data.formatted != null ? String(data.formatted) : '';
-      const raw = JSON.stringify(data, null, 2);
-      output.innerHTML =
-        '<pre id="formattedPre">' + escapeHtml(formatted) + '</pre>' +
-        '<details><summary>Raw JSON</summary><pre>' + escapeHtml(raw) + '</pre></details>';
+    function showError(status, message) {
+      errorBox.innerHTML = status
+        ? '<div class="error-box"><span class="status">' + escapeHtml(String(status)) + '</span> ' + escapeHtml(String(message)) + '</div>'
+        : '';
+      errorBox.style.display = status ? 'block' : 'none';
     }
 
     function escapeHtml(s) {
@@ -68,12 +300,62 @@
       return div.innerHTML;
     }
 
-    document.getElementById('runDemo').addEventListener('click', async function () {
-      const scenario = document.getElementById('scenario').value;
-      const body = scenario ? JSON.stringify({ scenario }) : '{}';
-      output.innerHTML = 'Loading…';
+    function renderResults(data) {
+      const report = data.report || {};
+      const primary = report.primary_constraint;
+      const nextAction = report.next_action || '';
+      const experiments = report.recommended_experiments || [];
+
+      let html = '';
+
+      if (primary) {
+        html += '<table class="constraint-table"><tbody>';
+        html += '<tr><th>Type</th><td>' + escapeHtml(primary.constraint_type || '—') + '</td></tr>';
+        html += '<tr><th>Metric</th><td>' + escapeHtml(primary.affected_metric || '—') + '</td></tr>';
+        html += '<tr><th>Delta</th><td>' + escapeHtml(primary.delta_percentage != null ? primary.delta_percentage + '%' : '—') + '</td></tr>';
+        html += '<tr><th>Score</th><td>' + escapeHtml(primary.constraint_score != null ? String(primary.constraint_score) : '—') + '</td></tr>';
+        html += '<tr><th>Confidence</th><td>' + escapeHtml(primary.confidence_score != null ? String(primary.confidence_score) : '—') + '</td></tr>';
+        html += '</tbody></table>';
+      } else {
+        html += '<p class="results-placeholder">No primary constraint detected.</p>';
+      }
+
+      if (nextAction) {
+        html += '<div class="callout"><strong>Next action</strong><br>' + escapeHtml(nextAction) + '</div>';
+      }
+
+      if (experiments.length > 0) {
+        html += '<p style="font-size:0.8125rem;font-weight:600;margin-bottom:0.5rem;">Recommended experiments</p>';
+        html += '<ul class="exp-list">';
+        experiments.slice(0, 3).forEach(function (exp) {
+          html += '<li class="exp-card">';
+          html += '<div class="title">' + escapeHtml(exp.title || '—') + '</div>';
+          html += '<div class="meta">Impact: ' + escapeHtml(exp.expected_impact_range || '—') + ' &middot; Effort: ' + escapeHtml(exp.effort != null ? String(exp.effort) : '—') + '</div>';
+          if (exp.hypothesis) {
+            html += '<details><summary>Hypothesis</summary>' + escapeHtml(exp.hypothesis) + '</details>';
+          }
+          html += '</li>';
+        });
+        html += '</ul>';
+      }
+
+      resultsContent.innerHTML = html || '<p class="results-placeholder">No results to display.</p>';
+      rawJsonPre.textContent = JSON.stringify(data, null, 2);
+    }
+
+    function showResult(data) {
       showError('');
+      setLoading(false);
+      renderResults(data);
+    }
+
+    async function doDemo() {
+      showError('');
+      setLoading(true);
+      resultsContent.innerHTML = '';
+      rawJsonPre.textContent = '';
       try {
+        const body = scenarioSelect.value ? JSON.stringify({ scenario: scenarioSelect.value }) : '{}';
         const r = await fetch('/analyze/demo', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -81,25 +363,29 @@
         });
         const data = await r.json();
         if (!r.ok) {
-          showError(data.detail || r.statusText || 'Request failed');
-          output.innerHTML = '';
+          showError(r.status, data.detail || r.statusText || 'Request failed');
+          setLoading(false);
+          resultsContent.innerHTML = '<p class="results-placeholder">Request failed.</p>';
           return;
         }
         showResult(data);
       } catch (e) {
-        showError(e.message || 'Request failed');
-        output.innerHTML = '';
+        showError('Error', e.message || 'Request failed');
+        setLoading(false);
+        resultsContent.innerHTML = '<p class="results-placeholder">Request failed.</p>';
       }
-    });
+    }
 
-    document.getElementById('runStripe').addEventListener('click', async function () {
-      const key = (document.getElementById('stripeKey').value || '').trim();
+    async function doStripe() {
+      const key = (stripeKeyInput.value || '').trim();
       if (!key) {
-        showError('Enter a Stripe API key.');
+        showError('Validation', 'Enter a Stripe API key.');
         return;
       }
-      output.innerHTML = 'Loading…';
       showError('');
+      setLoading(true);
+      resultsContent.innerHTML = '';
+      rawJsonPre.textContent = '';
       try {
         const r = await fetch('/analyze/stripe', {
           method: 'POST',
@@ -108,16 +394,21 @@
         });
         const data = await r.json();
         if (!r.ok) {
-          showError(data.detail || r.statusText || 'Request failed');
-          output.innerHTML = '';
+          showError(r.status, data.detail || r.statusText || 'Request failed');
+          setLoading(false);
+          resultsContent.innerHTML = '<p class="results-placeholder">Request failed.</p>';
           return;
         }
         showResult(data);
       } catch (e) {
-        showError(e.message || 'Request failed');
-        output.innerHTML = '';
+        showError('Error', e.message || 'Request failed');
+        setLoading(false);
+        resultsContent.innerHTML = '<p class="results-placeholder">Request failed.</p>';
       }
-    });
+    }
+
+    runDemoBtn.addEventListener('click', doDemo);
+    runStripeBtn.addEventListener('click', doStripe);
   </script>
 </body>
 </html>
