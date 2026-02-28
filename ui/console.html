@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RevenueOS Operator Console</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.25rem; margin-bottom: 1rem; }
+    section { margin-bottom: 1.5rem; }
+    label { display: block; margin-bottom: 0.25rem; font-weight: 500; }
+    input[type="password"], select { padding: 0.4rem 0.5rem; width: 100%; max-width: 320px; box-sizing: border-box; }
+    button { padding: 0.5rem 1rem; margin-right: 0.5rem; margin-top: 0.25rem; cursor: pointer; }
+    .warning { font-size: 0.8rem; color: #b45309; margin-top: 0.25rem; }
+    pre { background: #f5f5f5; padding: 1rem; overflow: auto; font-size: 0.85rem; white-space: pre-wrap; }
+    details { margin-top: 0.5rem; }
+    details pre { margin-top: 0.25rem; }
+    #output { margin-top: 1rem; }
+    #error { color: #c00; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>RevenueOS Operator Console</h1>
+
+  <section>
+    <label for="scenario">Scenario (optional)</label>
+    <select id="scenario">
+      <option value="">— None —</option>
+      <option value="revenue_decline">revenue_decline</option>
+      <option value="churn">churn</option>
+      <option value="trial_conversion">trial_conversion</option>
+      <option value="activation">activation</option>
+    </select>
+    <button type="button" id="runDemo">Run Demo</button>
+  </section>
+
+  <section>
+    <label for="stripeKey">Stripe API key (optional)</label>
+    <input type="password" id="stripeKey" placeholder="sk_test_...">
+    <p class="warning">Don't paste live keys. Use test keys.</p>
+    <button type="button" id="runStripe">Run Stripe Analysis</button>
+  </section>
+
+  <div id="output"></div>
+  <div id="error"></div>
+
+  <script>
+    const output = document.getElementById('output');
+    const errorEl = document.getElementById('error');
+
+    function showError(msg) {
+      errorEl.textContent = msg || '';
+      errorEl.style.display = msg ? 'block' : 'none';
+    }
+
+    function showResult(data) {
+      showError('');
+      const formatted = data.formatted != null ? String(data.formatted) : '';
+      const raw = JSON.stringify(data, null, 2);
+      output.innerHTML =
+        '<pre id="formattedPre">' + escapeHtml(formatted) + '</pre>' +
+        '<details><summary>Raw JSON</summary><pre>' + escapeHtml(raw) + '</pre></details>';
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    document.getElementById('runDemo').addEventListener('click', async function () {
+      const scenario = document.getElementById('scenario').value;
+      const body = scenario ? JSON.stringify({ scenario }) : '{}';
+      output.innerHTML = 'Loading…';
+      showError('');
+      try {
+        const r = await fetch('/analyze/demo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          showError(data.detail || r.statusText || 'Request failed');
+          output.innerHTML = '';
+          return;
+        }
+        showResult(data);
+      } catch (e) {
+        showError(e.message || 'Request failed');
+        output.innerHTML = '';
+      }
+    });
+
+    document.getElementById('runStripe').addEventListener('click', async function () {
+      const key = (document.getElementById('stripeKey').value || '').trim();
+      if (!key) {
+        showError('Enter a Stripe API key.');
+        return;
+      }
+      output.innerHTML = 'Loading…';
+      showError('');
+      try {
+        const r = await fetch('/analyze/stripe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stripe_api_key: key })
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          showError(data.detail || r.statusText || 'Request failed');
+          output.innerHTML = '';
+          return;
+        }
+        showResult(data);
+      } catch (e) {
+        showError(e.message || 'Request failed');
+        output.innerHTML = '';
+      }
+    });
+  </script>
+</body>
+</html>
