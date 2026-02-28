@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, Response
 
 from routers import router, analyze_router, connect_router
 
@@ -43,6 +43,13 @@ def privacy_page():
 def security_page():
     """Security posture."""
     return HTMLResponse(_read_ui("security.html"))
+
+
+@app.get("/about")
+def about_page():
+    """About page."""
+    path = _BASE_DIR / "ui" / "about.html"
+    return FileResponse(path)
 
 
 @app.get("/api/root")

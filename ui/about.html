@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About — RevenueOS</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;margin:0;background:#f7f8fa;color:#1a1d21;line-height:1.6}
+    .container{max-width:720px;margin:0 auto;padding:0 1.5rem 3rem}
+    .nav{background:#fff;border-bottom:1px solid #e6e9ec;padding:0.75rem 0}
+    .nav .container{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+    .nav a{color:#374151;text-decoration:none;font-size:0.9375rem;font-weight:500}
+    .nav a:hover{color:#635bff}
+    .page-title{text-align:center;padding:2.5rem 0 1rem;font-size:1.75rem;font-weight:700;color:#1a1d21}
+    section{margin:2.5rem 0}
+    section h2{font-size:1.25rem;font-weight:600;color:#1a1d21;margin:0 0 1rem}
+    section p{color:#4b5563;margin:0 0 1rem;line-height:1.65}
+    section ul{list-style:none;padding:0;margin:0}
+    section ul li{padding:0.4rem 0;padding-left:1.25rem;position:relative;color:#4b5563;line-height:1.5}
+    section ul li::before{content:"—";position:absolute;left:0;color:#9ca3af;font-weight:400}
+    .trust{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:1.5rem;margin:2rem 0}
+    .trust-note{font-size:0.8125rem;color:#6b7280;margin:1rem 0 0;padding-top:1rem;border-top:1px solid #e5e7eb}
+    .footer{border-top:1px solid #e6e9ec;padding:2rem 0;margin-top:3rem;text-align:center;font-size:0.875rem;color:#6b7280}
+    .footer p{margin:0.25rem 0}
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="/">RevenueOS</a>
+      <a href="/console">Console</a>
+      <a href="/about">About</a>
+      <a href="/security">Security</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h1 class="page-title">Why RevenueOS Exists</h1>
+
+    <section>
+      <h2>Founders shouldn't spend their nights reading dashboards.</h2>
+      <p>RevenueOS was built to give founders their time back. Instead of digging through Stripe reports and guessing what's wrong, RevenueOS identifies your primary revenue constraint automatically.</p>
+    </section>
+
+    <section>
+      <h2>Clarity > More Data</h2>
+      <ul>
+        <li>Detect churn persistence patterns</li>
+        <li>Detect sustained negative growth trends</li>
+        <li>Rank experiments by expected impact</li>
+        <li>Remove guesswork from revenue decisions</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Time is the real ROI</h2>
+      <p>The goal is simple: Less time analyzing reports. More time building, shipping, and living.</p>
+    </section>
+
+    <section class="trust">
+      <h2>Security & Trust</h2>
+      <p>RevenueOS uses Stripe OAuth. We never store your API keys. Access is read-only.</p>
+      <p>RevenueOS does not create charges, refunds, customers, or payouts.</p>
+      <p>You can revoke access anytime inside Stripe: Stripe Dashboard → Settings → Connect → Account connections.</p>
+      <p class="trust-note">Not affiliated with Stripe.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built by Brian</p>
+      <p>Cincinnati, OH</p>
+    </div>
+  </footer>
+</body>
+</html>
